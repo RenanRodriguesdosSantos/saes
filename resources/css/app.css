@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#classificationInput:disabled {
+    -webkit-text-fill-color: black !important;
+}

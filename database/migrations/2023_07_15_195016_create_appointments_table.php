@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
+            $table->text('symptoms')->nullable();
+            $table->text('results')->nullable();
+            $table->text('conduct')->nullable();
+            $table->unsignedTinyInteger('forwarding')->nullable();
+            $table->foreignId('doctor_id')->constrained('users');
+            $table->foreignId('service_id')->constrained();
+
             $table->timestamps();
         });
     }
