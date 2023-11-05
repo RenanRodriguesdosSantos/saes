@@ -11,6 +11,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 class Login extends Component implements HasForms
@@ -22,7 +23,8 @@ class Login extends Component implements HasForms
 
     public function render()
     {
-        return view('livewire.auth.login');
+        return view('livewire.auth.login')
+            ->layout('components.layouts.auth');
     }
 
     public function form(Form $form) : Form
@@ -72,5 +74,7 @@ class Login extends Component implements HasForms
         }
 
         session()->regenerate();
+
+        return redirect()->route('home');
     }
 }

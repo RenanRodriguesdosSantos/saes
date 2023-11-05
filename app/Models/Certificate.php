@@ -17,8 +17,14 @@ class Certificate extends Model
         'duration_type',
         'type',
         'start_at',
+        'end_at',
         'activity',
         'show_cids'
+    ];
+
+    protected $casts = [
+        'start_at' => 'datetime',
+        'end_at' => 'datetime'
     ];
 
     public function doctor() : BelongsTo

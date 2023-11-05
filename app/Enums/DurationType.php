@@ -7,9 +7,9 @@ use BenSampo\Enum\Enum;
 
 final class DurationType extends Enum
 {
-    #[Description('Dias')]
+    #[Description('dias')]
     const DAYS = 1;
 
-    #[Description('Meses')]
+    #[Description('meses')]
     const MONTHS = 5;
 }

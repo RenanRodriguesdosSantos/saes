@@ -8,6 +8,7 @@ use App\Enums\DurationType;
 use App\Models\Appointment;
 use App\Models\Certificate;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -65,6 +66,7 @@ class Certificates extends Component implements HasTable, HasForms
                             ->send();
                     })
                     ->modalSubmitActionLabel('Salvar')
+                    ->modalWidth('lg')
             ])
             ->actions([
                 Action::make('certificate_edit')
@@ -82,6 +84,10 @@ class Certificates extends Component implements HasTable, HasForms
                             ->send();
 
                     })->modalSubmitActionLabel('Salvar')
+                    ->modalWidth('sm'),
+                Action::make('certificate_print')
+                    ->label('Imprimir')
+                    ->url(fn ($record) => route('appointment.prints.certificate', $record))
             ]);
     }
 
@@ -111,11 +117,26 @@ class Certificates extends Component implements HasTable, HasForms
                         ->required(),
                     DatePicker::make('start_at')
                         ->label('Apartir de:')
-                        ->columnSpanFull(),
+                        ->columnSpanFull()
+                        ->required(),
                     Toggle::make('show_cids')
                         ->label('Exibir CIDs no atestado')
+                        ->columnSpanFull()
                 ])
-                ->hidden(fn ($get) => $get('type') != CertificateType::NORMAL)
+                ->hidden(fn ($get) => $get('type') != CertificateType::NORMAL),
+            Section::make()
+                ->columns(2)
+                ->schema([
+                    DateTimePicker::make('start_at')
+                        ->label('Entrada:')
+                        ->columnSpanFull()
+                        ->required(),
+                    DateTimePicker::make('end_at')
+                        ->label('Saída:')
+                        ->columnSpanFull()
+                        ->required(),
+                ])
+                ->hidden(fn ($get) => $get('type') != CertificateType::ATTENDANCE)
         ];
     }
 }

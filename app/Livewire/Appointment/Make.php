@@ -78,15 +78,6 @@ class Make extends Component implements HasForms, HasActions, HasInfolists
             ->modalContent(view('actions.screening'));
     }
 
-    public function showRecipesAction(): Action
-    {
-        return Action::make('showRecipes')
-            ->label('Receitas')
-            ->modalContent(view('actions.recipes'))
-            ->slideOver();
-            
-    }
-
     public function form(Form $form) : Form
     {
         return $form

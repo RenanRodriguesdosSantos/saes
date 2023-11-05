@@ -2,24 +2,16 @@
 
 namespace Database\Factories;
 
+use App\Enums\Gender;
 use App\Models\County;
 use App\Models\Ethnicity;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Nette\Utils\Random;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Patient>
- */
 class PatientFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
-        $gender  = Random::generate(1, 'fm');
+        $gender  = Gender::getRandomValue();
 
         return [
             'name' => $this->faker->name($gender),

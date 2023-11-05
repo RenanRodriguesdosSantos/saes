@@ -18,7 +18,12 @@
 </head>
 
 <body class="antialiased">
-    {{ $slot }}
+    <div class="flex w-full" x-data>
+        <x-sidebar/>
+        <div class="h-[100vh] overflow-y-auto w-full">
+            {{ $slot }}
+        </div>
+    </div>
 
     @filamentScripts
     @vite('resources/js/app.js')

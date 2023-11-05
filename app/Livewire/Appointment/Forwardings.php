@@ -77,7 +77,10 @@ class Forwardings extends Component implements HasTable, HasForms
                             ->success()
                             ->send();
 
-                    })->modalSubmitActionLabel('Salvar')
+                    })->modalSubmitActionLabel('Salvar'),
+                Action::make('forwarding_print')
+                    ->label('Imprimir')
+                    ->url(fn ($record) => route('appointment.prints.forwarding', $record))
             ]);
     }
 

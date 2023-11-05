@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedTinyInteger('type');
             $table->unsignedTinyInteger('activity')->nullable();
-            $table->date('start_at')->nullable();
+            $table->dateTime('start_at')->nullable();
+            $table->dateTime('end_at')->nullable();
             $table->boolean('show_cids')->default(false);
             $table->unsignedSmallInteger('duration')->nullable();
             $table->unsignedTinyInteger('duration_type')->nullable();

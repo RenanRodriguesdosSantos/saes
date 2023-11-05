@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Patient extends Model
 {
@@ -47,5 +48,10 @@ class Patient extends Model
     public function naturalness() : BelongsTo
     {
         return $this->belongsTo(County::class, 'naturalness_id');
+    }
+
+    public function services() : HasMany
+    {
+        return $this->hasMany(Service::class);
     }
 }

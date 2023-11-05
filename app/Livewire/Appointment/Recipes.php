@@ -70,7 +70,10 @@ class Recipes extends Component implements HasTable, HasForms
                             ->success()
                             ->send();
 
-                    })->modalSubmitActionLabel('Salvar')
+                    })->modalSubmitActionLabel('Salvar'),
+                Action::make('recipe_print')
+                    ->label('Imprimir')
+                    ->url(fn ($record) => route('appointment.prints.recipe', $record))
             ]);
     }
 

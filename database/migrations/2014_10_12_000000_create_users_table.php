@@ -18,6 +18,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->string('council_number', 30)->nullable();
+            $table->foreignId('council_state_id')->nullable()->constrained('states');
             $table->timestamps();
         });
     }

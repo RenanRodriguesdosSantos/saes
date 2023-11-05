@@ -30,4 +30,19 @@ class Appointment extends Model
     {
         return $this->belongsTo(Service::class);
     }
+
+    public function exams() : BelongsToMany
+    {
+        return $this->belongsToMany(Exam::class);
+    }
+
+    public function examItems() : HasMany
+    {
+        return $this->hasMany(AppointmentExam::class);
+    }
+
+    public function prescriptions() : HasMany
+    {
+        return $this->hasMany(Prescription::class);
+    }
 }

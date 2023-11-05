@@ -3,7 +3,12 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\Patient;
+use App\Models\Service;
+use App\Models\User;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,13 +17,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
-
-        \App\Models\User::factory()->create([
-            'name' => 'Recepção',
-            'email' => 'recepcao@test.com',
-            'password' => bcrypt('12345678')
+        $this->call([
+            RoleSeeder::class
         ]);
+
+        User::factory()->create([
+            'name' => 'Renan Rodrigues dos Santos',
+            'email' => 'admin@test.com',
+            'password' => bcrypt('12345678')
+        ])
+        ->assignRole(Role::all());
 
         $this->call([
             StateSeeder::class,
@@ -27,8 +35,20 @@ class DatabaseSeeder extends Seeder
             FlowchartSeeder::class,
             DiscriminatorSeeder::class,
             ClassificationSeeder::class,
-            PatientSeeder::class,
-            DiagnosisSeeder::class
+            DiagnosisSeeder::class,
+            ExamSeeder::class,
+            MedicineSeeder::class,
+            MaterialSeeder::class,
+            UserSeeder::class
         ]);
+
+        Patient::factory(10)
+            ->has(
+                Service::factory(5)
+                    ->forProhibited()
+                    ->forScreening()
+                    ->hasAppointments(2)
+            )
+            ->create();
     }
 }

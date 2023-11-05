@@ -7,6 +7,6 @@ use BenSampo\Enum\Enum;
 
 final class CertificateActivity extends Enum
 {
-    #[Description('Laborais')]
+    #[Description('laborais')]
     const LABOR = 1;
 }

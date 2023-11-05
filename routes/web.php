@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\LogoutController;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\ForgotPassword;
+use App\Livewire\Auth\Profile;
+use App\Livewire\Home;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,7 +24,15 @@ Route::middleware(['guest'])->group(function() {
     Route::get('/esqueceu-senha', ForgotPassword::class)->name('password.forgot');
 });
 
+Route::group([
+    'middleware' => 'auth'
+], function () {
+    Route::get('/', Home::class)->name('home');
+    Route::get('/perfil', Profile::class)->name('profile');
+    Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
+});
+
 require __DIR__.'/reception.php';
 require __DIR__.'/screening.php';
 require __DIR__.'/appointment.php';
-// require __DIR__.'/medication.php';
+require __DIR__.'/ambulatory.php';

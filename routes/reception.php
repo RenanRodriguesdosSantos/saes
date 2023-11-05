@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     'prefix' => 'recepcao',
-    'as' => 'reception',
+    'as' => 'reception.',
     'middleware' => [
         'auth'
     ]
