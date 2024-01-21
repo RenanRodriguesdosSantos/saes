@@ -24,6 +24,7 @@ class VitalSigns extends Component implements HasTable, HasForms
     use InteractsWithForms;
 
     public Service $service;
+    public bool $onlyView = false;
 
     public function render()
     {
@@ -53,12 +54,15 @@ class VitalSigns extends Component implements HasTable, HasForms
                     ->label('Peso')
                     ->numeric('2', ',', '.'),
                 TextColumn::make('glasgow')
-                    ->label('Glasgow')
-                    ->numeric(),
+                    ->label('Glasgow'),
+                TextColumn::make('updated_at')
+                    ->label('Criação')
+                    ->dateTime('d/m/y H:i')
             ])
+            ->recordAction('vital_signs_edit')
             ->actions([
                 Action::make('vital_signs_edit')
-                    ->form($this->getFormSchema())
+                    ->form(fn ($record) => $this->getFormSchema($record->nurse_id != auth()->id()))
                     ->label('editar')
                     ->fillForm(function($record) {
                         return $record->toArray();
@@ -72,6 +76,8 @@ class VitalSigns extends Component implements HasTable, HasForms
                             ->send();
 
                     })->modalSubmitActionLabel('Salvar')
+                    ->hidden($this->onlyView)
+                    ->modalSubmitAction(fn ($record) => $record->nurse_id != auth()->id() ? false : null)
             ])
             ->headerActions([
                 Action::make('vital_signs_create')
@@ -88,37 +94,59 @@ class VitalSigns extends Component implements HasTable, HasForms
                             ->send();
                     })
                     ->modalSubmitActionLabel('Salvar')
+                    ->hidden($this->onlyView)
             ])
-            ->emptyState(new HtmlString(''));
+            ->emptyState(new HtmlString(''))
+            ->paginated(false);
     }
 
 
-    public function getFormSchema() : array
+    public function getFormSchema($disabled = false) : array
     {
         return [
             Grid::make()
                 ->schema([
                     TextInput::make('blood_glucose')
                         ->label('Glicemia')
-                        ->numeric(),
+                        ->numeric()
+                        ->disabled($disabled),
                     TextInput::make('heart_rate')
                         ->label('Frequência Cardíaca')
-                        ->numeric(),
+                        ->numeric()
+                        ->disabled($disabled),
                     TextInput::make('saturation')
                         ->label('Saturação de Oxigênio')
-                        ->numeric(),
+                        ->numeric()
+                        ->disabled($disabled),
                     TextInput::make('temperature')
                         ->label('Temperatura Axilar')
-                        ->numeric(),
+                        ->numeric()
+                        ->disabled($disabled),
                     TextInput::make('blood_pressure')
                         ->label('Pressão Arterial')
-                        ->numeric(),
+                        ->disabled($disabled),
                     TextInput::make('weight')
                         ->label('Peso')
-                        ->numeric(),
+                        ->numeric()
+                        ->disabled($disabled),
                     Select::make('glasgow')
                         ->label('Escala de Glasgow')
-                        ->options([3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+                        ->options([
+                            3 => 3,
+                            4 => 4, 
+                            5 => 5,
+                            6 => 6,
+                            7 => 7,
+                            8 => 8,
+                            9 => 9,
+                            10 => 10,
+                            11 => 11,
+                            12 => 12,
+                            13 => 13,
+                            14 => 14,
+                            15 => 15
+                        ])
+                        ->disabled($disabled)
                 ])
         ];
     }

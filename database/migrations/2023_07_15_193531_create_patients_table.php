@@ -32,6 +32,7 @@ return new class extends Migration
             $table->foreignId('naturalness_id')->nullable()->constrained('counties');
             $table->foreignId('ethnicity_id')->nullable()->constrained();
 
+            $table->softDeletes();
             $table->timestamps();
         });
     }

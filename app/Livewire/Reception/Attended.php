@@ -32,7 +32,7 @@ class Attended extends Component implements HasTable, HasForms
     public function table(Table $table): Table 
     {
         return $table
-            ->query(Service::query())
+            ->query(Service::query()->latest())
             ->columns([
                 TextColumn::make('patient.cns')
                     ->label('CNS'),
@@ -44,7 +44,10 @@ class Attended extends Component implements HasTable, HasForms
                     ->label('CPF'),
                 TextColumn::make('patient.birth_date')
                     ->label('D. Nascimento')
-                    ->dateTime('d/m/Y')
+                    ->dateTime('d/m/Y'),
+                TextColumn::make('created_at')
+                    ->label('Entrada')
+                    ->dateTime('d/m/Y H:i')
             ])
             ->filters([
                 Filter::make('created_at')
@@ -61,9 +64,8 @@ class Attended extends Component implements HasTable, HasForms
                                 DatePicker::make('birth_date')
                                     ->label('Data de Nascimento')
                                     ->seconds(false),
-                                TextInput::make('cns')
-                                    ->label('Cartão Nascional de Saúde'),
                                 Fieldset::make('Período')
+                                    ->extraAttributes(['class' => 'py-1'])
                                     ->schema([
                                         DateTimePicker::make('start_date')
                                             ->label('Data inicial')
@@ -72,7 +74,7 @@ class Attended extends Component implements HasTable, HasForms
                                             ->label('Data final')
                                             ->seconds(false)
                                     ])
-                                    ->columnSpan(1)
+                                    ->columnSpan(2)
                             ])
                     ])
                     ->columnSpanFull()
@@ -92,10 +94,6 @@ class Attended extends Component implements HasTable, HasForms
                                     fn (Builder $query, $cpf): Builder => $query->where('cpf', 'LIKE', "$cpf%")
                                 )
                                 ->when(
-                                    $data['cns'],
-                                    fn (Builder $query, $cns): Builder => $query->where('cns', 'LIKE', "$cns%")
-                                )
-                                ->when(
                                     $data['birth_date'],
                                     fn (Builder $query, $birthDate): Builder => $query->whereDate('birth_date', $birthDate)
                                 )
@@ -106,6 +104,7 @@ class Attended extends Component implements HasTable, HasForms
                         });
                     })
             ])
-            ->filtersLayout(FiltersLayout::AboveContent);
+            ->filtersLayout(FiltersLayout::AboveContent)
+            ->paginationPageOptions(['20', '50', '100']);
     }
 }

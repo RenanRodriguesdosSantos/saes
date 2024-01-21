@@ -20,9 +20,9 @@ return new class extends Migration
             $table->string('blood_pressure', 8)->nullable();
             $table->float('weight')->nullable();
             $table->unsignedTinyInteger('glasgow')->nullable();
-
             $table->foreignId('service_id')->constrained();
             $table->foreignId('nurse_id')->constrained('users');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

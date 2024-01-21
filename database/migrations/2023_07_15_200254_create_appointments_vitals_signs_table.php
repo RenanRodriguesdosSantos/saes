@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('appointments_vitals_signs', function (Blueprint $table) {
             $table->id();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

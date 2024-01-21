@@ -1,10 +1,12 @@
 <div>
+    <x-page-title>Realizar / Coletar exame</x-page-title>
     <div class="mx-4 mb-5">
         <h3 class="mb-4 font-bold">Identificação do Paciente</h3>
         <div>{{ $this->patientInfolist }}</div>
     </div>
-    <div>
+    <div class="my-4">
         {{ $this->showScreeningAction }}
+        {{ $this->showVitalSignsAction }}
     </div>
     <div>
         <form wire:submit="submit" class="flex w-full flex-wrap">

@@ -5,3 +5,43 @@
 #classificationInput:disabled {
     -webkit-text-fill-color: black !important;
 }
+
+.bg_classification_1 {
+    @apply bg-blue-500;
+}
+
+.bg_classification_5 {
+    @apply bg-green-500;
+}
+
+.bg_classification_10 {
+    @apply bg-yellow-300;
+}
+
+.bg_classification_15 {
+    @apply bg-orange-400;
+}
+
+.bg_classification_20 {
+    @apply bg-red-500;
+}
+
+.bg_classification_1:hover {
+    @apply bg-blue-600 !important;
+}
+
+.bg_classification_5:hover {
+    @apply bg-green-600 !important;
+}
+
+.bg_classification_10:hover {
+    @apply bg-yellow-400 !important;
+}
+
+.bg_classification_15:hover {
+    @apply bg-orange-500 !important;
+}
+
+.bg_classification_20:hover {
+    @apply bg-red-600 !important;
+}

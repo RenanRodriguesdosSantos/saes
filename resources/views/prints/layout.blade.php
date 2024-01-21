@@ -15,7 +15,7 @@
     <div style="margin-bottom: 15px;">
         <table style="width: 100%;">
             <tr style="text-align: center;">
-                <td><img style="width: 60%; display: inline-block" src="data:image/png;base64,{{ base64_encode(file_get_contents(resource_path('images/logo.png'))) }}" /></td>
+                <td><img style="width: 70px; display: inline-block" src="data:image/png;base64,{{ base64_encode(file_get_contents(resource_path('images/logo.png'))) }}" /></td>
                 <td><h3>{{ config('entity.name') }}</h3></td>
             </tr>
             <tr>

@@ -4,9 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class AppointmentExam extends Model
 {
+    use SoftDeletes;
+    use LogsActivity;
+
     protected $table = "appointment_exam";
 
     protected $fillable = [
@@ -32,5 +38,10 @@ class AppointmentExam extends Model
     public function exam() : BelongsTo
     {
         return $this->belongsTo(Exam::class);
+    }
+
+    public function getActivitylogOptions() :  LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

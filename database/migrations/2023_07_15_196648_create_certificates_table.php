@@ -22,6 +22,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('duration_type')->nullable();
             $table->foreignId('doctor_id')->constrained('users');
             $table->foreignId('appointment_id')->constrained();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

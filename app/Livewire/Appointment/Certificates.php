@@ -58,6 +58,11 @@ class Certificates extends Component implements HasTable, HasForms
                     ->action(function(array $data) {
                         $data['appointment_id'] = $this->appointment->id;
                         $data['doctor_id'] = auth()->id();
+
+                        if ($data['type'] == CertificateType::ATTENDANCE) {
+                            $data['start_at'] = $data['attendance_start_at'];
+                        }
+
                         Certificate::create($data);
 
                         Notification::make('certificates_created_notification')
@@ -70,12 +75,20 @@ class Certificates extends Component implements HasTable, HasForms
             ])
             ->actions([
                 Action::make('certificate_edit')
-                    ->form($this->getFormSchema())
+                    ->form(fn ($record) => $this->getFormSchema($record->doctor_id != auth()->id()))
                     ->label('editar')
                     ->fillForm(function($record) {
-                        return $record->toArray();
+                        $data = $record->toArray();
+
+                        $data['attendance_start_at'] = $data['start_at'];
+
+                        return $data;
                     })
                     ->action(function($record, array $data) {
+                        if ($data['type'] == CertificateType::ATTENDANCE) {
+                            $data['start_at'] = $data['attendance_start_at'];
+                        }
+
                         $record->update($data);
 
                         Notification::make('certificates_updated_notification')
@@ -84,21 +97,24 @@ class Certificates extends Component implements HasTable, HasForms
                             ->send();
 
                     })->modalSubmitActionLabel('Salvar')
+                    ->modalSubmitAction(fn ($record) => $record->doctor_id == auth()->id() ? null : false)
                     ->modalWidth('sm'),
                 Action::make('certificate_print')
                     ->label('Imprimir')
                     ->url(fn ($record) => route('appointment.prints.certificate', $record))
+                    ->hidden(fn ($record) => $record->doctor_id != auth()->id())
             ]);
     }
 
-    private function getFormSchema(): array
+    private function getFormSchema($disabled = false): array
     {
         return [
             Select::make('type')
                 ->label('Tipo')
                 ->required()
                 ->reactive()
-                ->options(CertificateType::asSelectArray()),
+                ->options(CertificateType::asSelectArray())
+                ->disabled($disabled),
             Section::make()
                 ->columns(2)
                 ->schema([
@@ -106,35 +122,42 @@ class Certificates extends Component implements HasTable, HasForms
                         ->label('Tipo de Atividade')
                         ->required()
                         ->options(CertificateActivity::asSelectArray())
-                        ->columnSpanFull(),
+                        ->columnSpanFull()
+                        ->disabled($disabled),
                     TextInput::make('duration')
                         ->label('Duração')
                         ->numeric()
-                        ->required(),
+                        ->required()
+                        ->disabled($disabled),
                     Select::make('duration_type')
                         ->label('Tipo de duração')
                         ->options(DurationType::asSelectArray())
-                        ->required(),
+                        ->required()
+                        ->disabled($disabled),
                     DatePicker::make('start_at')
                         ->label('Apartir de:')
                         ->columnSpanFull()
-                        ->required(),
+                        ->required()
+                        ->disabled($disabled),
                     Toggle::make('show_cids')
                         ->label('Exibir CIDs no atestado')
                         ->columnSpanFull()
+                        ->disabled($disabled)
                 ])
                 ->hidden(fn ($get) => $get('type') != CertificateType::NORMAL),
             Section::make()
                 ->columns(2)
                 ->schema([
-                    DateTimePicker::make('start_at')
+                    DateTimePicker::make('attendance_start_at')
                         ->label('Entrada:')
                         ->columnSpanFull()
-                        ->required(),
+                        ->required()
+                        ->disabled($disabled),
                     DateTimePicker::make('end_at')
                         ->label('Saída:')
                         ->columnSpanFull()
-                        ->required(),
+                        ->required()
+                        ->disabled($disabled),
                 ])
                 ->hidden(fn ($get) => $get('type') != CertificateType::ATTENDANCE)
         ];

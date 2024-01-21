@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserRole;
 use App\Livewire\Ambulatory\ExamAttended;
 use App\Livewire\Ambulatory\ExamMake;
 use App\Livewire\Ambulatory\PrescriptionAttended;
@@ -11,7 +12,8 @@ Route::group([
     'prefix' => 'ambulatorio',
     'as' => 'ambulatory.',
     'middleware' => [
-        'auth'
+        'auth',
+        'role:' . UserRole::NURSING_TECHNICIAN
     ]
 ], function () {
     Route::group([

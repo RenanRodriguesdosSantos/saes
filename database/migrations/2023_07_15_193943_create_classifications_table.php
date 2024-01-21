@@ -16,6 +16,7 @@ return new class extends Migration
             $table->tinyInteger('value');
             $table->foreignId('flowchart_id')->constrained();
             $table->foreignId('discriminator_id')->constrained();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -5,14 +5,19 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use SoftDeletes;
+    use LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -35,6 +40,10 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = [
+        'first_role'
+    ];
+
     /**
      * The attributes that should be cast.
      *
@@ -53,5 +62,15 @@ class User extends Authenticatable
     public function getfirstNameAttribute() : string
     {
         return  explode(' ', $this->name)[0];
+    }
+
+    public function getFirstRoleAttribute()
+    {
+        return  $this->roles()->first();
+    }
+
+    public function getActivitylogOptions() :  LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

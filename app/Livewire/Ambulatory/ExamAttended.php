@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Ambulatory;
 
+use App\Enums\ExamStatus;
 use App\Models\Appointment;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Fieldset;
@@ -15,6 +16,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
@@ -113,8 +115,14 @@ class ExamAttended extends Component implements HasTable, HasForms
                             });
                         });
                     })
-                    ->columnSpanFull()
+                    ->columnSpanFull(),
+                    SelectFilter::make('status')
+                        ->options(ExamStatus::asSelectArray())
+                        ->default(ExamStatus::PENDING)
+                        ->query(function ($data, $query) {
+                            return $query->whereHas('examItems', fn ($query) => $query->where('status', $data['value']));
+                        })
             ])
-            ->filtersLayout(FiltersLayout::AboveContent);
+            ->filtersLayout(FiltersLayout::AboveContentCollapsible);
     }
 }

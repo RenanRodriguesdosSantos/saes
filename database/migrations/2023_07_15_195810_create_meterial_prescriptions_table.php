@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('technician_id')->nullable()->constrained('users');
             $table->unsignedSmallInteger('amount');
             $table->string('note')->nullable();
-
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -7,10 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Service extends Model
 {
       use HasFactory;
+      use SoftDeletes;
+      use LogsActivity;
 
       protected $fillable = [
          'status',
@@ -25,14 +31,14 @@ class Service extends Model
          return $this->belongsTo(Patient::class);
       }
 
-      public function prohibited() : BelongsTo
+      public function prohibited() : HasOne
       {
-         return $this->belongsTo(Prohibited::class);
+         return $this->hasOne(Prohibited::class);
       }
 
-      public function screening() : BelongsTo
+      public function screening() : HasOne
       {
-         return $this->belongsTo(Screening::class);
+         return $this->hasOne(Screening::class);
       }
 
       public function appointments() : HasMany
@@ -43,5 +49,10 @@ class Service extends Model
       public function vitalSigns() : HasMany
       {
          return $this->hasMany(VitalSigns::class);
+      }
+
+      public function getActivitylogOptions(): LogOptions
+      {
+         return LogOptions::defaults();
       }
 }

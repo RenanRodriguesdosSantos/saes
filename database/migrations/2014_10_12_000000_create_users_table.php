@@ -20,6 +20,7 @@ return new class extends Migration
             $table->rememberToken();
             $table->string('council_number', 30)->nullable();
             $table->foreignId('council_state_id')->nullable()->constrained('states');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

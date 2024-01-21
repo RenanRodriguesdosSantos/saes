@@ -7,10 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Appointment extends Model
 {
     use HasFactory;
+    use SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
         'symptoms',
@@ -44,5 +49,10 @@ class Appointment extends Model
     public function prescriptions() : HasMany
     {
         return $this->hasMany(Prescription::class);
+    }
+
+    public function getActivitylogOptions() :  LogOptions
+    {
+        return LogOptions::defaults();
     }
 }

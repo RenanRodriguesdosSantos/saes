@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('description');
             $table->foreignId('classification_id')->constrained();
             $table->foreignId('nurse_id')->constrained('users');
+            $table->foreignId('service_id')->constrained('services');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

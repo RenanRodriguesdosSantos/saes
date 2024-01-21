@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserRole;
 use App\Http\Controllers\PrintsController;
 use App\Livewire\Appointment\Attended;
 use App\Livewire\Appointment\Make;
@@ -9,10 +10,11 @@ Route::group([
     'prefix' => 'consulta-medica',
     'as' => 'appointment.',
     'middleware' => [
-        'auth'
+        'auth',
+        'role:' . UserRole::DOCTOR
     ]
 ], function () {
-    Route::get('/atendimentos', Attended::class)->name('attended');
+    Route::get('/atendimentos/{status}', Attended::class)->name('attended');
     Route::get('/atender/{appointment}', Make::class)->name('make');
     Route::group([
         'prefix' => 'imprimir',

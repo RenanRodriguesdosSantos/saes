@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('forwarding')->nullable();
             $table->foreignId('doctor_id')->constrained('users');
             $table->foreignId('service_id')->constrained();
-
+            $table->softDeletes();
             $table->timestamps();
         });
     }

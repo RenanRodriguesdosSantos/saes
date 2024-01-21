@@ -18,7 +18,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            RoleSeeder::class
+            RoleSeeder::class,
+            StateSeeder::class,
+            CountySeeder::class
         ]);
 
         User::factory()->create([
@@ -26,11 +28,9 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@test.com',
             'password' => bcrypt('12345678')
         ])
-        ->assignRole(Role::all());
+        ->assignRole(Role::first());
 
         $this->call([
-            StateSeeder::class,
-            CountySeeder::class,
             EthnicitySeeder::class,
             FlowchartSeeder::class,
             DiscriminatorSeeder::class,
@@ -42,11 +42,11 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class
         ]);
 
-        Patient::factory(10)
+        Patient::factory(100)
             ->has(
-                Service::factory(5)
-                    ->forProhibited()
-                    ->forScreening()
+                Service::factory()
+                    ->hasProhibited()
+                    ->hasScreening()
                     ->hasAppointments(2)
             )
             ->create();

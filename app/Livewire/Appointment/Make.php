@@ -32,12 +32,15 @@ class Make extends Component implements HasForms, HasActions, HasInfolists
     public Appointment $appointment;
     public array $data;
     public int $tab = 1;
+    public bool $canEdit = false;
 
     public function mount()
     {
         $this->data = [
             'diagnoses' => null
         ];
+
+        $this->canEdit = $this->appointment->doctor_id == auth()->id();
 
         $this->form->fill([
             'symptoms' => $this->appointment->symptoms,
@@ -75,7 +78,18 @@ class Make extends Component implements HasForms, HasActions, HasInfolists
     {
         return Action::make('showScreening')
             ->label('Classificação de Risco')
-            ->modalContent(view('actions.screening'));
+            ->modalContent(view('actions.screening', ['appointment' => $this->appointment]))
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel('Fechar');
+    }
+
+    public function showVitalSignsAction(): Action
+    {
+        return Action::make('showVitalSigns')
+            ->label('Sinais vitais')
+            ->modalContent(view('actions.vital-signs', ['appointment' => $this->appointment]))
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel('Fechar');
     }
 
     public function form(Form $form) : Form
@@ -86,14 +100,17 @@ class Make extends Component implements HasForms, HasActions, HasInfolists
                     ->schema([
                         Textarea::make('symptoms')
                             ->label('Principais sinais de sintomas clínicos')
-                            ->required(),
+                            ->required()
+                            ->disabled(!$this->canEdit),
                         Textarea::make('results')
                             ->label('Principais resultados de provas diagnósticas')
-                            ->required(),
+                            ->required()
+                            ->disabled(!$this->canEdit),
                         Select::make('diagnoses')
                             ->label('Hipóteses Diagnósticas')
                             ->multiple()
                             ->required()
+                            ->disabled(!$this->canEdit)
                             ->searchable()
                             ->getSearchResultsUsing(function (string $search) {
                                 return Diagnosis::where('code', 'LIKE', "%$search%")
@@ -107,11 +124,13 @@ class Make extends Component implements HasForms, HasActions, HasInfolists
                             }),
                         Textarea::make('conduct')
                             ->label('Conduta Terapeutica')
-                            ->required(),
+                            ->required()
+                            ->disabled(!$this->canEdit),
                         Select::make('forwarding')
                             ->label('Encaminhamento')
                             ->options(Forwarding::asSelectArray())
                             ->required()
+                            ->disabled(!$this->canEdit)
                     ])
             ])
             ->statePath('data');

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('appointment_id')->constrained();
             $table->foreignId('diagnosis_id')->constrained();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

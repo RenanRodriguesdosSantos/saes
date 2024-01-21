@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('technician_id')->nullable()->constrained('users');
             $table->unique(['appointment_id', 'exam_id']);
             $table->unsignedTinyInteger('status');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

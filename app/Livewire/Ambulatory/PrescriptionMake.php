@@ -32,6 +32,7 @@ class PrescriptionMake extends Component implements HasForms, HasActions, HasInf
 
     public Prescription $prescription;
     public array $data;
+    public int $tab = 1;
 
     public function mount()
     {
@@ -78,7 +79,9 @@ class PrescriptionMake extends Component implements HasForms, HasActions, HasInf
     {
         return Action::make('showScreening')
             ->label('Classificação de Risco')
-            ->modalContent(view('actions.screening'));
+            ->modalContent(view('actions.screening', ['appointment' => $this->prescription->appointment]))
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel('Fechar');
     }
 
     public function form(Form $form) : Form
@@ -146,5 +149,10 @@ class PrescriptionMake extends Component implements HasForms, HasActions, HasInf
                 ->success()
                 ->send();
        });
+    }
+
+    public function setTab(int $value)
+    {
+        $this->tab = $value;
     }
 }

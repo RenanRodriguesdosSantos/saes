@@ -2,28 +2,18 @@
 
 namespace App\Livewire\Ambulatory;
 
-use App\Enums\MedicinePresentation;
-use App\Enums\PrescriptionStatus;
 use App\Models\Material;
-use App\Models\MedicinePrescription;
 use App\Models\Prescription;
-use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
-use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Concerns\InteractsWithInfolists;
-use Filament\Infolists\Contracts\HasInfolists;
-use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class PrescriptionMaterials extends Component implements HasForms, HasActions
@@ -36,20 +26,7 @@ class PrescriptionMaterials extends Component implements HasForms, HasActions
 
     public function mount()
     {
-        // $data = [];
-
-        // $this->prescription
-        //     ->items()
-        //     ->get()
-        //     ->each(function (MedicinePrescription $item) use (&$data) {
-        //         $data["amount_{$item->id}"] = $item->amount;
-        //         $data["presentation_{$item->id}"] = MedicinePresentation::getDescription($item->medicine_apresentation);
-        //         $data["doctor_note_{$item->id}"] = $item->doctor_note;
-        //         $data["status_{$item->id}"] = $item->status;
-        //         $data["technician_note_{$item->id}"] = $item->technician_note;
-        //     });
-
-        // $this->form->fill($data);
+        $this->form->fill([]);
     }
 
     public function render()
@@ -61,10 +38,11 @@ class PrescriptionMaterials extends Component implements HasForms, HasActions
     {
         return $form
             ->schema([
-                Repeater::make('items')
+                Repeater::make('materials')
                     ->label('Materiais')
                     ->reorderable(false)
                     ->columns(6)
+                    ->relationship()
                     ->schema([
                         TextInput::make('amount')
                             ->label('Quantidade')
@@ -86,33 +64,24 @@ class PrescriptionMaterials extends Component implements HasForms, HasActions
                             ->label('Observação')
                             ->columnSpan(2)
                     ])
+                    ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
+                        $data['technician_id'] = auth()->id();
+                 
+                        return $data;
+                    })
             ])
-            ->statePath('data');
+            ->statePath('data')
+            ->model($this->prescription);
     }
 
     public function submit()
     {
-        $data = $this->form->getState();
+        $this->form->getState();
+        $this->form->model($this->prescription)->saveRelationships();
 
-        DB::transaction(function () use ($data) {
-            $this->prescription
-                    ->items()
-                    ->get()
-                    ->each(function ($item) use ($data) {
-                        if ($data["status_{$item->id}"] != $item->status || $data["technician_note_{$item->id}"] != $item->technician_note) {
-                            $item->update([
-                                'technician_id' => auth()->id(),
-                                'technician_note' => $data["technician_note_{$item->id}"],
-                                'status' => $data["status_{$item->id}"]
-                            ]);
-                        }
-                    });
-
-
-            Notification::make('prescription_store_notification')
-                ->title('Atendimento salvo com sucesso!')
-                ->success()
-                ->send();
-       });
+         Notification::make('prescription_materials_store_notification')
+             ->title('Materiais salvos com sucesso!')
+             ->success()
+             ->send();
     }
 }

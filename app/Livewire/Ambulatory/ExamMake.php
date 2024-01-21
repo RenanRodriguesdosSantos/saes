@@ -73,7 +73,18 @@ class ExamMake extends Component implements HasForms, HasActions, HasInfolists
     {
         return Action::make('showScreening')
             ->label('Classificação de Risco')
-            ->modalContent(view('actions.screening'));
+            ->modalContent(view('actions.screening', ['appointment' => $this->appointment]))
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel('Fechar');
+    }
+
+    public function showVitalSignsAction(): Action
+    {
+        return Action::make('showVitalSigns')
+            ->label('Sinais vitais')
+            ->modalContent(view('actions.vital-signs', ['appointment' => $this->appointment]))
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel('Fechar');
     }
 
     public function form(Form $form) : Form

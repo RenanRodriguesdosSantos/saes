@@ -27,7 +27,7 @@ class ClassificationSeeder extends Seeder
                 [
                     'flowchart_id' => '2',
                     'discriminator_id' => '1',
-                    'value' => EnumsClassification::LITTLE_URGENT
+                    'value' => EnumsClassification::VERY_URGENT
                 ],
                 [
                     'flowchart_id' => '1',
@@ -37,7 +37,7 @@ class ClassificationSeeder extends Seeder
                 [
                     'flowchart_id' => '2',
                     'discriminator_id' => '2',
-                    'value' => EnumsClassification::URGENT
+                    'value' => EnumsClassification::EMERGENCY
                 ]
             ])
             ->each(function ($data) {

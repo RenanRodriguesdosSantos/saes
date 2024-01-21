@@ -67,7 +67,7 @@ class Prescriptions extends Component implements HasTable, HasForms
                                         'medicine_id' => $value['medicine_id'],
                                         'amount' => $value['amount'],
                                         'medicine_apresentation' => $value['medicine_apresentation'],
-                                        'doctor_note' => $value['note'],
+                                        'doctor_note' => $value['doctor_note'],
                                         'status' => PrescriptionStatus::PENDING
                                     ]);
                             }
@@ -84,7 +84,7 @@ class Prescriptions extends Component implements HasTable, HasForms
             ])
             ->actions([
                 Action::make('prescritption_edit')
-                    ->form($this->getFormSchema())
+                    ->form(fn ($record) => $this->getFormSchema($record->doctor_id != auth()->id()))
                     ->label('editar')
                     ->fillForm(function(Prescription $record) {
                         $data['items'] = [];
@@ -117,7 +117,7 @@ class Prescriptions extends Component implements HasTable, HasForms
                                     $item->update([
                                         'amount' => $value['amount'],
                                         'medicine_apresentation' => $value['medicine_apresentation'],
-                                        'doctor_note' => $value['note']
+                                        'doctor_note' => $value['doctor_note']
                                     ]);
                                 } else {
                                     $record->medicines()
@@ -125,7 +125,7 @@ class Prescriptions extends Component implements HasTable, HasForms
                                             'medicine_id' => $value['medicine_id'],
                                             'amount' => $value['amount'],
                                             'medicine_apresentation' => $value['medicine_apresentation'],
-                                            'doctor_note' => $value['note']
+                                            'doctor_note' => $value['doctor_note']
                                         ]);
                                 }
                             }
@@ -137,11 +137,12 @@ class Prescriptions extends Component implements HasTable, HasForms
                         });
                     })
                     ->modalWidth('6xl')
-                    ->modalSubmitActionLabel('Salvar'),
+                    ->modalSubmitActionLabel('Salvar')
+                    ->modalSubmitAction(fn ($record) => $record->doctor_id == auth()->id() ? null : false)
             ]);
     }
 
-    private function getFormSchema(): array
+    private function getFormSchema($disabled = false): array
     {
         return [
             Repeater::make('items')
@@ -168,10 +169,11 @@ class Prescriptions extends Component implements HasTable, HasForms
                     Select::make('medicine_apresentation')
                         ->label('Apresentação')
                         ->options(MedicinePresentation::asSelectArray()),
-                    TextInput::make('note')
+                    TextInput::make('doctor_note')
                         ->label('Observação')
                         ->columnSpan(2)
                 ])
+                ->disabled($disabled)
         ];
     }
 }

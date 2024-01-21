@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('patient_id');
             $table->foreignId('prohibited_id')->nullable();
             $table->foreignId('screening_id')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

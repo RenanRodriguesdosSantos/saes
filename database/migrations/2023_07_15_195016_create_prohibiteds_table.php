@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('prohibiteds', function (Blueprint $table) {
             $table->id();
             $table->foreignId('receptionist_id')->constrained('users');
+            $table->foreignId('service_id')->constrained('services');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

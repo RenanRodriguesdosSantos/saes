@@ -2,23 +2,15 @@
 
 namespace App\Livewire\Screening;
 
-use App\Enums\Classification;
 use App\Enums\ServiceStatus;
 use App\Models\Classification as ModelsClassification;
 use App\Models\Flowchart;
 use App\Models\Screening;
 use App\Models\Service;
-use App\Models\VitalSigns;
-use Filament\Forms\Components\Actions;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Fieldset;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\View;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
@@ -37,6 +29,7 @@ class Make extends Component implements HasForms, HasInfolists
 
     public Service $service;
     public array $data;
+    public bool $onlyView = false;
 
     public function render()
     {
@@ -78,41 +71,45 @@ class Make extends Component implements HasForms, HasInfolists
     {
         return $form
             ->schema([
-                        Fieldset::make('Classificação de Risco')
-                            ->columns(1)
-                            ->schema([
-                                Textarea::make('description')
-                                    ->label('Descrição')
-                                    ->required()
-                                    ->rows(5),
-                                Select::make('flowchart')
-                                    ->label('Fluxograma')
-                                    ->options(Flowchart::all()->pluck('name', 'id')->toArray())
-                                    ->reactive(),
-                                Select::make('classification_id')
-                                    ->label('Discriminador')
-                                    ->reactive()
-                                    ->options(function (callable $get) {
-                                        if ($get('flowchart'))  {
-                                            return ModelsClassification::where('flowchart_id', $get('flowchart'))->with('discriminator')->get()->pluck('discriminator.name', 'id')->toArray();
-                                        }
-        
-                                        return [];
-                                    }),
-                                TextInput::make('classification')
-                                    ->label(false)
-                                    ->disabled()
-                                    ->extraInputAttributes(function (callable $get, callable $set) {
-                                        if ($classificationId = $get('classification_id')) {
-                                            $classification = ModelsClassification::find($classificationId);
-                                            $set('classification', config('classification.descriptions.' . $classification->value));
-                                            return ['style' => "text-align: center; color: #000 !important; background-color: ". config('classification.colors.' . $classification->value) .";", "id" => "classificationInput"];
-                                        } else {
-                                            $set('classification', '');
-                                        }
-                                        return [];
-                                    })
-                                ])
+                Fieldset::make($this->onlyView ? null : 'Classificação de Risco')
+                    ->columns(1)
+                    ->schema([
+                        Textarea::make('description')
+                            ->label('Descrição')
+                            ->required()
+                            ->rows(5)
+                            ->disabled($this->onlyView),
+                        Select::make('flowchart')
+                            ->label('Fluxograma')
+                            ->options(Flowchart::all()->pluck('name', 'id')->toArray())
+                            ->reactive()
+                            ->disabled($this->onlyView),
+                        Select::make('classification_id')
+                            ->label('Discriminador')
+                            ->reactive()
+                            ->options(function (callable $get) {
+                                if ($get('flowchart'))  {
+                                    return ModelsClassification::where('flowchart_id', $get('flowchart'))->with('discriminator')->get()->pluck('discriminator.name', 'id')->toArray();
+                                }
+
+                                return [];
+                            })
+                            ->disabled($this->onlyView),
+                        TextInput::make('classification')
+                            ->label(false)
+                            ->disabled()
+                            ->extraInputAttributes(function (callable $get, callable $set) {
+                                if ($classificationId = $get('classification_id')) {
+                                    $classification = ModelsClassification::find($classificationId);
+                                    $set('classification', config('classification.descriptions.' . $classification->value));
+                                    return ['style' => "text-align: center; color: #000 !important; background-color: ". config('classification.colors.' . $classification->value) .";", "id" => "classificationInput"];
+                                } else {
+                                    $set('classification', '');
+                                }
+                                return [];
+                            })
+                        ])
+                        ->disabled($this->onlyView)
                     ])
             ->statePath('data');
     }
@@ -124,14 +121,14 @@ class Make extends Component implements HasForms, HasInfolists
         DB::transaction(function () use ($data) {
 
             if (!$this->service->screening) {
-                $screening = Screening::create([
+                Screening::create([
                     'description' => $data['description'],
                     'classification_id' => $data['classification_id'],
                     'nurse_id' => auth()->id(),
+                    'service_id' => $this->service->id
                 ]);
 
                 $this->service->update([
-                    'screening_id'=> $screening->id,
                     'status' => ServiceStatus::SCREENING
                 ]);
 

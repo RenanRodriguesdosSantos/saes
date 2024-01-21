@@ -21,7 +21,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('amount');
             $table->unsignedTinyInteger('status');
             $table->foreignId('technician_id')->nullable()->constrained('users');
-
+            $table->softDeletes();
             $table->timestamps();
         });
     }

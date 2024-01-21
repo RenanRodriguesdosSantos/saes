@@ -1,3 +1,3 @@
 <div>
-    @livewire('screening.make', ['service' => $this->appointment->service])
+    @livewire('screening.make', ['service' => $appointment->service, 'onlyView' => true])
 </div>

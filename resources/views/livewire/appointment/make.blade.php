@@ -1,10 +1,12 @@
 <div>
+    <x-page-title>Atendimento</x-page-title>
     <div class="mx-4 mb-5">
         <h3 class="mb-4 font-bold">Identificação do Paciente</h3>
         <div>{{ $this->patientInfolist }}</div>
     </div>
-    <div>
+    <div class="my-4">
         {{ $this->showScreeningAction }}
+        {{ $this->showVitalSignsAction }}
     </div>
     <div>
         <button class="rounded-t-xl p-2 px-8 text-white hover:bg-gray-700 {{ $tab == 1 ? 'bg-gray-500' : 'bg-gray-900' }}"
@@ -18,7 +20,7 @@
         <button class="rounded-t-xl p-2 px-8 text-white hover:bg-gray-700 {{ $tab == 5 ? 'bg-gray-500' : 'bg-gray-900' }}"
             wire:click="setTab(5)">Exames</button>
         <button class="rounded-t-xl p-2 px-8 text-white hover:bg-gray-700 {{ $tab == 6 ? 'bg-gray-500' : 'bg-gray-900' }}"
-            wire:click="setTab(6)">Prescrição</button>
+            wire:click="setTab(6)">Prescrições</button>
     </div>
     @switch($tab)
         @case(1)
@@ -27,10 +29,12 @@
                     <div class="w-full">
                         {{ $this->form }}
                     </div>
+                    @if($this->canEdit)
                     <div class="flex w-full justify-end">
                         <button type="submit"
                             class="m-2 mt-3 rounded-full bg-gray-900 p-2 px-16 text-white hover:bg-gray-700">Salvar</button>
                     </div>
+                    @endif
                 </form>
             </div>
         @break

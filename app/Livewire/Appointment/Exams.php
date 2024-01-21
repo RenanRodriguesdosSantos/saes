@@ -46,7 +46,7 @@ class Exams extends Component implements HasTable, HasForms
             ->columns([
                 TextColumn::make('exam.name')
                     ->label('Exame'),
-                TextColumn::make('description')
+                TextColumn::make('doctor_note')
                     ->label('Descrição'),
                 TextColumn::make('doctor.name')
                     ->label('Médico'),
@@ -70,9 +70,10 @@ class Exams extends Component implements HasTable, HasForms
                                         ->attach($exam->id, [
                                             'doctor_id' => auth()->id(),
                                             'status' => ExamStatus::PENDING,
-                                            'doctor_note' => $note
+                                            'doctor_note' => $note,
+                                            'created_at' => now(),
+                                            'updated_at' => now()
                                         ]);
-
                                 }
                             });
 
@@ -86,7 +87,7 @@ class Exams extends Component implements HasTable, HasForms
             ->actions([
                 Action::make('exam_edit')
                     ->form([
-                        Textarea::make("note")
+                        Textarea::make("doctor_note")
                             ->label('Descrição / Justificativa')
                     ])
                     ->label('editar')
@@ -102,6 +103,7 @@ class Exams extends Component implements HasTable, HasForms
                             ->send();
 
                     })->modalSubmitActionLabel('Salvar')
+                    ->hidden(fn ($record) => $record->doctor_id != auth()->id())
             ]);
     }
 

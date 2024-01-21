@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Ambulatory;
 
+use App\Enums\PrescriptionStatus;
 use App\Models\Appointment;
+use App\Models\Prescription;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Grid;
@@ -15,6 +17,8 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
@@ -32,24 +36,24 @@ class PrescriptionAttended extends Component implements HasTable, HasForms
     public function table(Table $table) : Table
     {
         return $table
-            ->query(Appointment::whereHas('prescriptions'))
+            ->query(Prescription::query())
             ->columns([
-                TextColumn::make('service.patient.cns')
+                TextColumn::make('appointment.service.patient.cns')
                     ->label('CNS'),
-                TextColumn::make('service.patient.name')
+                TextColumn::make('appointment.service.patient.name')
                     ->label('Nome'),
-                TextColumn::make('service.patient.mother')
+                TextColumn::make('appointment.service.patient.mother')
                     ->label('Mãe'),
-                TextColumn::make('service.patient.cpf')
+                TextColumn::make('appointment.service.patient.cpf')
                     ->label('CPF'),
-                TextColumn::make('service.patient.birth_date')
+                TextColumn::make('appointment.service.patient.birth_date')
                     ->label('D. Nascimento')
                     ->date('d/m/Y')
             ])
             ->actions([
                 Action::make('prescription_make')
                     ->label('Iniciar atendimento')
-                    ->action(function (Appointment $record) {
+                    ->action(function (Prescription $record) {
                         return redirect()->route('ambulatory.prescriptions.make', $record);
                     })
             ])
@@ -84,37 +88,45 @@ class PrescriptionAttended extends Component implements HasTable, HasForms
                             ])
                     ])
                     ->query(function (Builder $query, array $data): Builder {
-                        return $query->whereHas('service', function (Builder $query) use ($data) {
-                            return $query->whereHas('patient', function(Builder $query) use ($data) {
-                                return $query
-                                    ->when(
-                                        $data['name'],
-                                        fn (Builder $query, $name): Builder => $query->where('name', 'LIKE', "$name%"),
-                                    )
-                                    ->when(
-                                        $data['mother'],
-                                        fn (Builder $query, $mother): Builder => $query->where('mother', 'LIKE', "$mother%"),
-                                    )
-                                    ->when(
-                                        $data['cpf'],
-                                        fn (Builder $query, $cpf): Builder => $query->where('cpf', 'LIKE', "$cpf%"),
-                                    )
-                                    ->when(
-                                        $data['cns'],
-                                        fn (Builder $query, $cns): Builder => $query->where('cns', 'LIKE', "$cns%"),
-                                    )
-                                    ->when(
-                                        $data['birth_date'],
-                                        fn (Builder $query, $birthDate): Builder => $query->whereDate('birth_date', $birthDate),
-                                    )->when(
-                                        $data['start_date'] && $data['end_date'],
-                                        fn (Builder $query): Builder => $query->whereBetween('created_at',[$data['start_date'], $data['end_date']])
-                                    );
+                        return $query->whereHas('appointment', function (Builder $query) use ($data) {
+                            return $query->whereHas('service', function (Builder $query) use ($data) {
+                                return $query->whereHas('patient', function(Builder $query) use ($data) {
+                                    return $query
+                                        ->when(
+                                            $data['name'],
+                                            fn (Builder $query, $name): Builder => $query->where('name', 'LIKE', "$name%"),
+                                        )
+                                        ->when(
+                                            $data['mother'],
+                                            fn (Builder $query, $mother): Builder => $query->where('mother', 'LIKE', "$mother%"),
+                                        )
+                                        ->when(
+                                            $data['cpf'],
+                                            fn (Builder $query, $cpf): Builder => $query->where('cpf', 'LIKE', "$cpf%"),
+                                        )
+                                        ->when(
+                                            $data['cns'],
+                                            fn (Builder $query, $cns): Builder => $query->where('cns', 'LIKE', "$cns%"),
+                                        )
+                                        ->when(
+                                            $data['birth_date'],
+                                            fn (Builder $query, $birthDate): Builder => $query->whereDate('birth_date', $birthDate),
+                                        )->when(
+                                            $data['start_date'] && $data['end_date'],
+                                            fn (Builder $query): Builder => $query->whereBetween('created_at',[$data['start_date'], $data['end_date']])
+                                        );
+                                });
                             });
                         });
                     })
-                    ->columnSpanFull()
+                    ->columnSpanFull(),
+                    SelectFilter::make('status')
+                        ->options(PrescriptionStatus::asSelectArray())
+                        ->default(PrescriptionStatus::PENDING)
+                        ->query(function ($data, $query) {
+                            return $query->whereHas('medicines', fn ($query) => $query->where('status', $data['value']));
+                        })
             ])
-            ->filtersLayout(FiltersLayout::AboveContent);
+            ->filtersLayout(FiltersLayout::AboveContentCollapsible);
     }
 }

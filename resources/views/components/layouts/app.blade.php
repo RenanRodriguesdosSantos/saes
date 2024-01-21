@@ -19,8 +19,8 @@
 
 <body class="antialiased">
     <div class="flex w-full" x-data>
-        <x-sidebar/>
-        <div class="h-[100vh] overflow-y-auto w-full">
+        <x-sidebar />
+        <div class="h-[100vh] w-full overflow-y-auto pl-1">
             {{ $slot }}
         </div>
     </div>

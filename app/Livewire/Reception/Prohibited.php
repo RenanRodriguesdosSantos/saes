@@ -16,6 +16,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Notifications\Notification;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\EditAction;
@@ -75,18 +76,24 @@ class Prohibited extends Component implements HasForms, HasTable
                     ->label(false)
                     ->requiresConfirmation()
                     ->modalHeading('Abrir ficha')
-                    ->modalDescription('Deseja realmente abrir ficha de atendimento para esse paciente?')
+                    ->modalDescription(fn ($record) => "Deseja realmente abrir ficha de atendimento para o paciente {$record->name}?")
                     ->action(function (Patient $record) {
                         DB::transaction(function () use ($record) {
-                            $prohibited = ModelsProhibited::create([
+                            $service = Service::create([
+                                'patient_id' => $record->id,
+                                'status' => ServiceStatus::PROHIBITED,
+                            ]);
+                            
+                            ModelsProhibited::create([
+                                'service_id' => $service->id,
                                 'receptionist_id' => auth()->id()
                             ]);
     
-                            Service::create([
-                                'patient_id' => $record->id,
-                                'prohibited_id' => $prohibited->id,
-                                'status' => ServiceStatus::PROHIBITED
-                            ]);
+
+                            Notification::make('create_service_alert')
+                                ->success()
+                                ->title('Ficha aberta com sucesso!')
+                                ->send();
                         });
                     })
             ])
@@ -104,7 +111,7 @@ class Prohibited extends Component implements HasForms, HasTable
                                     ->label('Nome da mãe'),
                                 TextInput::make('cpf')
                                     ->label('CPF')
-                                    ->mask('000.000.000-00'),
+                                    ->mask('999.999.999-99'),
                                 DatePicker::make('birth_date')
                                     ->label('Data de Nascimento'),
                                 TextInput::make('cns')
@@ -137,6 +144,7 @@ class Prohibited extends Component implements HasForms, HasTable
                     })
             ])
             ->filtersLayout(FiltersLayout::AboveContent)
+            ->paginationPageOptions(['20', '50', '100'])
             ->emptyStateHeading('Nenhum paciente encontrado')
             ->emptyStateDescription(null)
             ->emptyStateActions([

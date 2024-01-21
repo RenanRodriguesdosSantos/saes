@@ -16,6 +16,7 @@ return new class extends Migration
             $table->text('description');
             $table->foreignId('doctor_id')->constrained('users');
             $table->foreignId('appointment_id')->constrained();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

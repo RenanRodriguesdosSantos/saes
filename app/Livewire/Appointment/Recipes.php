@@ -57,7 +57,7 @@ class Recipes extends Component implements HasTable, HasForms
             ])
             ->actions([
                 Action::make('recipe_edit')
-                    ->form($this->getFormSchema())
+                    ->form(fn ($record) => $this->getFormSchema($record->doctor_id != auth()->id()))
                     ->label('editar')
                     ->fillForm(function($record) {
                         return $record->toArray();
@@ -70,20 +70,23 @@ class Recipes extends Component implements HasTable, HasForms
                             ->success()
                             ->send();
 
-                    })->modalSubmitActionLabel('Salvar'),
+                    })->modalSubmitActionLabel('Salvar')
+                    ->modalSubmitAction(fn ($record) => $record->doctor_id == auth()->id() ? null : false),
                 Action::make('recipe_print')
                     ->label('Imprimir')
                     ->url(fn ($record) => route('appointment.prints.recipe', $record))
+                    ->hidden(fn ($record) => $record->doctor_id != auth()->id())
             ]);
     }
 
-    private function getFormSchema(): array
+    private function getFormSchema($disabled = false): array
     {
         return [
             Textarea::make('description')
                 ->label('Descrição')
                 ->rows(15)
                 ->required()
+                ->disabled($disabled)
         ];
     }
 }

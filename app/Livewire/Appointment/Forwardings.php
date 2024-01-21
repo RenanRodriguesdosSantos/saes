@@ -61,7 +61,7 @@ class Forwardings extends Component implements HasTable, HasForms
             ])
             ->actions([
                 Action::make('forwarding_edit')
-                    ->form($this->getFormSchema())
+                    ->form(fn ($record) => $this->getFormSchema($record->doctor_id != auth()->id()))
                     ->label('editar')
                     ->fillForm(function($record) {
                         $data = $record->toArray();
@@ -77,30 +77,36 @@ class Forwardings extends Component implements HasTable, HasForms
                             ->success()
                             ->send();
 
-                    })->modalSubmitActionLabel('Salvar'),
+                    })->modalSubmitActionLabel('Salvar')
+                    ->modalSubmitAction(fn ($record) => $record->doctor_id == auth()->id() ? null : false),
                 Action::make('forwarding_print')
                     ->label('Imprimir')
                     ->url(fn ($record) => route('appointment.prints.forwarding', $record))
+                    ->hidden(fn ($record) => $record->doctor_id != auth()->id())
             ]);
     }
 
-    private function getFormSchema(): array
+    private function getFormSchema($disabled = false): array
     {
         return [
             TextInput::make('specialty')
                 ->label('Especialidade')
-                ->required(),
+                ->required()
+                ->disabled($disabled),
             TextInput::make('entity')
                 ->label('Estabelecimento')
-                ->required(),
+                ->required()
+                ->disabled($disabled),
             Textarea::make('clinical_history')
                 ->label('História Clínica')
                 ->required()
-                ->default(fn () => $this->appointment->symptoms),
+                ->default(fn () => $this->appointment->symptoms)
+                ->disabled($disabled),
             Textarea::make('exams')
                 ->label('Exames realizados')
                 ->required()
-                ->default(fn () => $this->appointment->results),
+                ->default(fn () => $this->appointment->results)
+                ->disabled($disabled),
             Select::make('diagnoses')
                 ->label('Hipóteses Diagnósticas')
                 ->multiple()
@@ -117,6 +123,7 @@ class Forwardings extends Component implements HasTable, HasForms
                         ->mapWithKeys(fn (Diagnosis $diagnosis) => [$diagnosis->id => "{$diagnosis->code} - {$diagnosis->description}"]);
                 })
                 ->default(fn () => $this->appointment->diagnoses->pluck('id')->toArray())
+                ->disabled($disabled)
         ];
     }
 }
