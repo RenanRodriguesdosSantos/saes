@@ -37,12 +37,12 @@ $ vendor/bin/sail ps
 
 ```bash
 $ vendor/bin/sail php artisan migrate --seed
-
+```
 ### Uso
 
 - Aplicação: [http://localhost](app)
 
-- Usuário já cadastrados
+- Usuários já cadastrados
     - recepcionista@test.com
     - enfermeiro@test.com
     - medico@test.com
