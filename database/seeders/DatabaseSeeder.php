@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
+use App\Enums\UserRole;
 use App\Models\Patient;
 use App\Models\Service;
 use App\Models\User;
@@ -24,11 +25,28 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::factory()->create([
-            'name' => 'Renan Rodrigues dos Santos',
-            'email' => 'admin@test.com',
-            'password' => bcrypt('12345678')
+            'name' => 'Recepcionista',
+            'email' => 'recepcionista@test.com',
         ])
-        ->assignRole(Role::first());
+        ->assignRole(Role::findByName(UserRole::RECEPTIONIST));
+
+        User::factory()->create([
+            'name' => 'Enfermeiro',
+            'email' => 'enfermeiro@test.com',
+        ])
+        ->assignRole(Role::findByName(UserRole::NURSE));
+
+        User::factory()->create([
+            'name' => 'Médico',
+            'email' => 'medico@test.com',
+        ])
+        ->assignRole(Role::findByName(UserRole::DOCTOR));
+
+        User::factory()->create([
+            'name' => 'Técnico de Enfermagem',
+            'email' => 'tecnico_enfermagem@test.com',
+        ])
+        ->assignRole(Role::findByName(UserRole::NURSING_TECHNICIAN));
 
         $this->call([
             EthnicitySeeder::class,
